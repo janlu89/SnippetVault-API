@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="SnippetVault.API/SnippetVault.API.csproj" />
+  <Project Path="SnippetVault.Application/SnippetVault.Application.csproj" />
+  <Project Path="SnippetVault.Domain/SnippetVault.Domain.csproj" />
+  <Project Path="SnippetVault.Infrastructure/SnippetVault.Infrastructure.csproj" />
+  <Project Path="SnippetVault.Tests/SnippetVault.Tests.csproj" />
+</Solution>
