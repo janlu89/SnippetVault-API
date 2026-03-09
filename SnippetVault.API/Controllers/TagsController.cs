@@ -16,7 +16,7 @@ namespace SnippetVault.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery]string? search = null) 
         {
-            var tags = _tagService.GetAllTags(search);
+            var tags = await _tagService.GetAllTags(search);
             return Ok(tags);
         }
     }
