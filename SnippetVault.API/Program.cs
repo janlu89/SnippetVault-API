@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
+using Serilog;
+using SnippetVault.API.Extensions;
 using SnippetVault.Application.Interfaces;
 using SnippetVault.Application.Services;
 using SnippetVault.Application.Settings;
@@ -9,7 +11,6 @@ using SnippetVault.Infrastructure.Data;
 using SnippetVault.Infrastructure.Repositories;
 using SnippetVault.Infrastructure.Services;
 using System.Text;
-using Serilog;
 
 // Configure Serilog before the host is built.
 // This is important — if the host itself fails to start, you still want logs.
@@ -26,6 +27,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Replace the default Microsoft logging with Serilog
 builder.Host.UseSerilog();
+
+//CORS Fix
+builder.Services.AddCorsPolicy(builder.Configuration);
 
 // Controllers
 builder.Services.AddControllers();
@@ -86,6 +90,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors("AllowedOrigins");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
