@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using Serilog;
@@ -38,8 +39,22 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 // Database
+// Use SQLite in development for simplicity, SQL Server in production.
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+{
+    if (builder.Environment.IsDevelopment())
+    {
+        options.UseSqlite(
+            builder.Configuration.GetConnectionString("DefaultConnection"));
+    }
+    else
+    {
+        options.UseSqlServer(
+            builder.Configuration.GetConnectionString("DefaultConnection"))
+               .ConfigureWarnings(w =>
+                   w.Ignore(RelationalEventId.PendingModelChangesWarning));
+    }
+});
 
 // JWT Settings
 builder.Services.Configure<JwtSettings>(
@@ -94,6 +109,17 @@ app.UseCors("AllowedOrigins");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
+// Apply pending EF Core migrations automatically on container startup.
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    if (app.Environment.IsDevelopment())
+        db.Database.EnsureCreated();
+    else
+        db.Database.Migrate();
+}
+
 app.Run();
 
 // Ensures all buffered log entries are flushed to disk on shutdown
