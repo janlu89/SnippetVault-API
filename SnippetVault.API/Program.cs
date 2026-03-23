@@ -35,6 +35,9 @@ builder.Services.AddCorsPolicy(builder.Configuration);
 // Controllers
 builder.Services.AddControllers();
 
+// Health Checks
+builder.Services.AddHealthChecks();
+
 // OpenAPI
 builder.Services.AddOpenApi();
 
@@ -107,6 +110,7 @@ app.UseCors("AllowedOrigins");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.MapHealthChecks("/health");
 
 // Apply pending EF Core migrations automatically on container startup.
 using (var scope = app.Services.CreateScope())
